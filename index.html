@@ -3,9 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Чат</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    <title>AI Чат</title>
     
     <style>
         /* ============================================
@@ -21,7 +19,6 @@
             --text-bubble-user: #ffffff;
             --text-bubble-bot: #ffffff;
             --border: rgba(255,255,255,0.05);
-            --shadow: 0 8px 32px rgba(0,0,0,0.4);
         }
         
         [data-theme="light"] {
@@ -34,20 +31,12 @@
             --text-bubble-user: #ffffff;
             --text-bubble-bot: #000000;
             --border: rgba(0,0,0,0.05);
-            --shadow: 0 8px 32px rgba(0,0,0,0.08);
         }
         
-        /* ============================================
-           ОБЩИЕ СТИЛИ
-           ============================================ */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: -apple-system, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text-primary);
             height: 100vh;
@@ -58,34 +47,23 @@
             overflow: hidden;
         }
         
-        /* ============================================
-           КОНТЕЙНЕР
-           ============================================ */
         .app {
             width: 100%;
             max-width: 430px;
             height: 100vh;
             max-height: 932px;
             background: var(--bg-chat);
-            border-radius: 0;
             display: flex;
             flex-direction: column;
             position: relative;
             overflow: hidden;
-            box-shadow: var(--shadow);
             transition: all 0.3s ease;
         }
         
         @media (min-width: 431px) {
-            .app {
-                border-radius: 32px;
-                height: 90vh;
-            }
+            .app { border-radius: 32px; height: 90vh; }
         }
         
-        /* ============================================
-           ШАПКА
-           ============================================ */
         .header {
             padding: 16px 20px 12px;
             display: flex;
@@ -97,36 +75,14 @@
             transition: all 0.3s ease;
         }
         
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .menu-btn {
-            background: none;
-            border: none;
-            color: var(--text-primary);
-            font-size: 22px;
-            cursor: pointer;
-            padding: 4px;
-            transition: all 0.2s;
-            opacity: 0.6;
-        }
-        
-        .menu-btn:hover {
-            opacity: 1;
-        }
-        
         .header-title {
             font-size: 17px;
             font-weight: 600;
             letter-spacing: -0.3px;
         }
         
-        .header-right {
+        .header-actions {
             display: flex;
-            align-items: center;
             gap: 8px;
         }
         
@@ -141,14 +97,21 @@
             opacity: 0.6;
         }
         
-        .theme-btn:hover {
-            opacity: 1;
-            color: var(--text-primary);
+        .theme-btn:hover { opacity: 1; color: var(--text-primary); }
+        
+        .clear-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            transition: all 0.2s;
+            opacity: 0.5;
         }
         
-        /* ============================================
-           ЧАТ
-           ============================================ */
+        .clear-btn:hover { opacity: 1; color: #ff3b30; }
+        
         .chat {
             flex: 1;
             overflow-y: auto;
@@ -161,13 +124,8 @@
             transition: all 0.3s ease;
         }
         
-        .chat::-webkit-scrollbar {
-            width: 0;
-        }
+        .chat::-webkit-scrollbar { width: 0; }
         
-        /* ============================================
-           СООБЩЕНИЯ
-           ============================================ */
         .message {
             display: flex;
             flex-direction: column;
@@ -177,23 +135,12 @@
         }
         
         @keyframes messageIn {
-            from {
-                opacity: 0;
-                transform: scale(0.95) translateY(8px);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
+            from { opacity: 0; transform: scale(0.95) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
         
-        .message.bot {
-            align-self: flex-start;
-        }
-        
-        .message.user {
-            align-self: flex-end;
-        }
+        .message.bot { align-self: flex-start; }
+        .message.user { align-self: flex-end; }
         
         .bubble {
             padding: 10px 14px;
@@ -226,18 +173,9 @@
             letter-spacing: 0.2px;
         }
         
-        .message.bot .time {
-            padding-left: 12px;
-        }
+        .message.bot .time { padding-left: 12px; }
+        .message.user .time { padding-right: 12px; text-align: right; }
         
-        .message.user .time {
-            padding-right: 12px;
-            text-align: right;
-        }
-        
-        /* ============================================
-           ИНДИКАТОР ПЕЧАТИ
-           ============================================ */
         .typing {
             align-self: flex-start;
             display: flex;
@@ -257,22 +195,14 @@
             animation: typingBounce 1.4s infinite;
             opacity: 0.4;
         }
-        
-        .typing span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .typing span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
         
         @keyframes typingBounce {
             0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
             30% { transform: translateY(-6px); opacity: 1; }
         }
         
-        /* ============================================
-           ВВОД
-           ============================================ */
         .input-area {
             padding: 10px 16px 16px;
             background: var(--bg-chat);
@@ -335,259 +265,36 @@
             transform: scale(1);
         }
         
-        .input-wrapper .send-btn.active {
-            opacity: 1;
-        }
+        .input-wrapper .send-btn.active { opacity: 1; }
+        .input-wrapper .send-btn:active { transform: scale(0.92); }
         
-        .input-wrapper .send-btn:active {
-            transform: scale(0.92);
-        }
-        
-        /* ============================================
-           САЙДБАР (чаты)
-           ============================================ */
-        .sidebar {
-            position: absolute;
-            top: 0;
-            left: -300px;
-            width: 280px;
-            height: 100%;
-            background: var(--bg-chat);
-            border-right: 1px solid var(--border);
-            padding: 16px;
-            transition: all 0.35s cubic-bezier(0.32, 0.72, 0, 1);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 4px 0 32px rgba(0,0,0,0.2);
-        }
-        
-        .sidebar.open {
-            left: 0;
-        }
-        
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .sidebar-header .title {
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-        
-        .sidebar-header .close-btn {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 24px;
-            cursor: pointer;
-            padding: 4px;
-        }
-        
-        .sidebar .new-chat-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 16px;
-            border-radius: 14px;
-            border: none;
-            background: var(--bg-bubble-user);
-            color: #fff;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-            width: 100%;
-            margin-bottom: 12px;
-        }
-        
-        .sidebar .new-chat-btn:active {
-            transform: scale(0.97);
-        }
-        
-        .chat-list {
-            flex: 1;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-        
-        .chat-list .item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-        
-        .chat-list .item:hover {
-            background: var(--bg-bubble-bot);
-            color: var(--text-primary);
-        }
-        
-        .chat-list .item.active {
-            background: var(--bg-bubble-bot);
-            color: var(--text-primary);
-        }
-        
-        .chat-list .item .icon {
-            font-size: 16px;
-            opacity: 0.6;
-        }
-        
-        .chat-list .item .text {
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        
-        .chat-list .item .del {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: 14px;
-            padding: 4px;
-            opacity: 0;
-            transition: all 0.2s;
-        }
-        
-        .chat-list .item:hover .del {
-            opacity: 1;
-        }
-        
-        .chat-list .item .del:hover {
-            color: #ff3b30;
-        }
-        
-        /* ============================================
-           OVERLAY
-           ============================================ */
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(4px);
-            z-index: 50;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.35s ease;
-        }
-        
-        .overlay.show {
-            opacity: 1;
-            pointer-events: all;
-        }
-        
-        /* ============================================
-           АДАПТИВ
-           ============================================ */
         @media (max-width: 430px) {
-            .app {
-                border-radius: 0 !important;
-                max-height: 100vh;
-            }
-            
-            .sidebar {
-                width: 85%;
-                left: -85%;
-            }
-            
-            .sidebar.open {
-                left: 0;
-            }
+            .app { border-radius: 0 !important; max-height: 100vh; }
         }
         
         @media (max-width: 380px) {
-            .bubble {
-                font-size: 15px;
-                padding: 8px 12px;
-            }
-            .header-title {
-                font-size: 16px;
-            }
-            .message {
-                max-width: 88%;
-            }
+            .bubble { font-size: 15px; padding: 8px 12px; }
+            .header-title { font-size: 16px; }
+            .message { max-width: 88%; }
         }
     </style>
 </head>
 <body>
     <div class="app" id="app">
-        <!-- OVERLAY -->
-        <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
-        
-        <!-- SIDEBAR -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="title">Чаты</div>
-                <button class="close-btn" onclick="closeSidebar()">✕</button>
-            </div>
-            <button class="new-chat-btn" onclick="newChat()">✏️ Новый чат</button>
-            <div class="chat-list" id="chatList">
-                <div class="item active" onclick="selectChat(this)">
-                    <span class="icon">💬</span>
-                    <span class="text">Привет, мир!</span>
-                    <button class="del" onclick="event.stopPropagation(); deleteChat(this)">✕</button>
-                </div>
-                <div class="item" onclick="selectChat(this)">
-                    <span class="icon">💬</span>
-                    <span class="text">Как дела?</span>
-                    <button class="del" onclick="event.stopPropagation(); deleteChat(this)">✕</button>
-                </div>
-                <div class="item" onclick="selectChat(this)">
-                    <span class="icon">💬</span>
-                    <span class="text">Расскажи про AI</span>
-                    <button class="del" onclick="event.stopPropagation(); deleteChat(this)">✕</button>
-                </div>
-            </div>
-        </div>
-        
         <!-- HEADER -->
         <div class="header">
-            <div class="header-left">
-                <button class="menu-btn" onclick="toggleSidebar()">☰</button>
-                <div class="header-title">Чат</div>
-            </div>
-            <div class="header-right">
+            <div class="header-title">🤖 AI Чат</div>
+            <div class="header-actions">
+                <button class="clear-btn" onclick="clearChat()" title="Очистить">🗑️</button>
                 <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
             </div>
         </div>
         
         <!-- CHAT -->
         <div class="chat" id="chat">
-            <!-- БОТ -->
             <div class="message bot">
                 <div class="bubble">Привет! Я AI ассистент. Чем могу помочь? 🚀</div>
                 <div class="time">12:00</div>
-            </div>
-            
-            <!-- ПОЛЬЗОВАТЕЛЬ -->
-            <div class="message user">
-                <div class="bubble">Привет! Расскажи что-нибудь интересное</div>
-                <div class="time">12:01</div>
-            </div>
-            
-            <!-- БОТ -->
-            <div class="message bot">
-                <div class="bubble">Знаешь ли ты, что ChatGPT набрал 1 млн пользователей за 5 дней? Это самый быстрый рост в истории!</div>
-                <div class="time">12:01</div>
             </div>
         </div>
         
@@ -604,6 +311,28 @@
 
     <script>
         // ============================================
+        // TELEGRAM WEBAPP - ОТПРАВКА ЗАПРОСОВ К БОТУ
+        // ============================================
+        let tg = null;
+        let userData = null;
+        let isInTelegram = false;
+        
+        try {
+            tg = window.Telegram?.WebApp;
+            if (tg) {
+                tg.ready();
+                tg.expand();
+                isInTelegram = true;
+                if (tg.initDataUnsafe?.user) {
+                    userData = tg.initDataUnsafe.user;
+                    console.log('👤 Пользователь:', userData);
+                }
+            }
+        } catch(e) {
+            console.log('⚠️ Не в Telegram WebApp');
+        }
+        
+        // ============================================
         // ТЕМА
         // ============================================
         let theme = localStorage.getItem('theme') || 'dark';
@@ -616,71 +345,11 @@
             themeBtn.textContent = t === 'dark' ? '☀️' : '🌙';
         }
         
-        function toggleTheme() {
-            applyTheme(theme === 'dark' ? 'light' : 'dark');
-        }
-        
+        function toggleTheme() { applyTheme(theme === 'dark' ? 'light' : 'dark'); }
         applyTheme(theme);
         
         // ============================================
-        // САЙДБАР
-        // ============================================
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('overlay').classList.toggle('show');
-        }
-        
-        function closeSidebar() {
-            document.getElementById('sidebar').classList.remove('open');
-            document.getElementById('overlay').classList.remove('show');
-        }
-        
-        // ============================================
-        // ЧАТЫ
-        // ============================================
-        function selectChat(el) {
-            document.querySelectorAll('.chat-list .item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
-            document.querySelector('.header-title').textContent = el.querySelector('.text').textContent;
-            closeSidebar();
-        }
-        
-        function deleteChat(el) {
-            const item = el.closest('.item');
-            if (confirm('Удалить чат?')) {
-                item.remove();
-                if (item.classList.contains('active')) {
-                    const first = document.querySelector('.chat-list .item');
-                    if (first) selectChat(first);
-                    else newChat();
-                }
-            }
-        }
-        
-        function newChat() {
-            const list = document.getElementById('chatList');
-            const item = document.createElement('div');
-            item.className = 'item';
-            item.innerHTML = `
-                <span class="icon">💬</span>
-                <span class="text">Новый чат</span>
-                <button class="del" onclick="event.stopPropagation(); deleteChat(this)">✕</button>
-            `;
-            item.onclick = function() { selectChat(this); };
-            list.prepend(item);
-            selectChat(item);
-            
-            // Очищаем сообщения
-            document.getElementById('chat').innerHTML = `
-                <div class="message bot">
-                    <div class="bubble">Привет! Я AI ассистент. Чем могу помочь? 🚀</div>
-                    <div class="time">${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
-                </div>
-            `;
-        }
-        
-        // ============================================
-        // ОТПРАВКА
+        // ЧАТ
         // ============================================
         const chat = document.getElementById('chat');
         const input = document.getElementById('input');
@@ -700,33 +369,26 @@
             }
         }
         
+        function getTime() {
+            return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+        }
+        
         function addMessage(role, text, time) {
             const div = document.createElement('div');
             div.className = `message ${role}`;
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble';
-            bubble.textContent = text;
-            
-            const timeEl = document.createElement('div');
-            timeEl.className = 'time';
-            timeEl.textContent = time || new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-            
-            div.appendChild(bubble);
-            div.appendChild(timeEl);
+            div.innerHTML = `
+                <div class="bubble">${text}</div>
+                <div class="time">${time || getTime()}</div>
+            `;
             chat.appendChild(div);
             chat.scrollTop = chat.scrollHeight;
         }
         
         function showTyping() {
             const div = document.createElement('div');
-            div.className = 'message bot';
+            div.className = 'typing';
             div.id = 'typing';
-            div.innerHTML = `
-                <div class="typing">
-                    <span></span><span></span><span></span>
-                </div>
-            `;
+            div.innerHTML = `<span></span><span></span><span></span>`;
             chat.appendChild(div);
             chat.scrollTop = chat.scrollHeight;
         }
@@ -736,42 +398,132 @@
             if (el) el.remove();
         }
         
-        function sendMessage() {
+        function clearChat() {
+            if (confirm('Очистить все сообщения?')) {
+                chat.innerHTML = `
+                    <div class="message bot">
+                        <div class="bubble">История очищена. Начни новый диалог! 🧹</div>
+                        <div class="time">${getTime()}</div>
+                    </div>
+                `;
+                
+                // Отправляем запрос на очистку боту (если в Telegram)
+                if (tg) {
+                    tg.sendData(JSON.stringify({action: 'clear'}));
+                }
+            }
+        }
+        
+        // ============================================
+        // ОТПРАВКА СООБЩЕНИЯ В БОТА
+        // ============================================
+        async function sendMessage() {
             const text = input.value.trim();
             if (!text || processing) return;
             
-            const time = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+            const time = getTime();
             
+            // Добавляем сообщение пользователя
             addMessage('user', text, time);
             input.value = '';
             input.style.height = 'auto';
             sendBtn.classList.remove('active');
             processing = true;
             
+            // Показываем печать
             showTyping();
             
-            setTimeout(() => {
+            try {
+                if (tg) {
+                    // ОТПРАВКА В TELEGRAM БОТА ЧЕРЕЗ WebApp
+                    console.log('📤 Отправка в бота:', text);
+                    tg.sendData(JSON.stringify({
+                        action: 'message',
+                        message: text
+                    }));
+                    
+                    // Ждем ответ от бота (через сообщение в чате)
+                    const response = await waitForBotResponse();
+                    hideTyping();
+                    addMessage('bot', response, getTime());
+                    
+                } else {
+                    // Локальный режим (вне Telegram)
+                    hideTyping();
+                    addMessage('bot', '⚠️ Открой бота в Telegram для использования AI', getTime());
+                }
+                
+            } catch (error) {
                 hideTyping();
-                
-                const replies = [
-                    'Отличный вопрос! 🤔 Давайте разберемся вместе.',
-                    'Интересно! 💡 Вот что я думаю по этому поводу...',
-                    'Хорошая мысль! 🎯 Давай углубимся в эту тему.',
-                    'Я вижу, что ты разбираешься в этом! 🔥',
-                    'Отличный подход! 💪 Продолжай в том же духе.',
-                    'Это действительно важно! 🚀 Вот несколько идей.'
-                ];
-                
-                addMessage('bot', replies[Math.floor(Math.random() * replies.length)], time);
-                processing = false;
-            }, 1200 + Math.random() * 1000);
+                addMessage('bot', '❌ Ошибка: ' + error.message, getTime());
+            }
+            
+            processing = false;
         }
+        
+        // ============================================
+        // ОЖИДАНИЕ ОТВЕТА ОТ БОТА
+        // ============================================
+        function waitForBotResponse() {
+            return new Promise((resolve) => {
+                // Слушаем ответ от бота через сообщения
+                const handler = (event) => {
+                    // Проверяем, что это ответ от бота
+                    if (event.data && event.data.startsWith('🤖')) {
+                        const response = event.data.replace('🤖', '').trim();
+                        document.removeEventListener('webapp_data', handler);
+                        resolve(response);
+                    }
+                };
+                document.addEventListener('webapp_data', handler);
+                
+                // Таймаут 30 секунд
+                setTimeout(() => {
+                    document.removeEventListener('webapp_data', handler);
+                    resolve('⏰ Превышено время ожидания ответа от бота');
+                }, 30000);
+            });
+        }
+        
+        // ============================================
+        // ПЕРЕХВАТ ОТВЕТОВ ОТ БОТА (через WebApp)
+        // ============================================
+        // Бот отправляет ответы в чат, мы их перехватываем
+        if (tg) {
+            // Обработка сообщений от бота
+            tg.onEvent('message', (msg) => {
+                if (msg.text && msg.text.includes('🤖')) {
+                    const response = msg.text.replace('🤖', '').trim();
+                    document.dispatchEvent(new CustomEvent('webapp_data', {
+                        detail: response
+                    }));
+                }
+            });
+        }
+        
+        // Слушаем события от бота
+        document.addEventListener('webapp_data', (e) => {
+            const response = e.detail;
+            if (response && typeof response === 'string' && !response.includes('action')) {
+                hideTyping();
+                addMessage('bot', response, getTime());
+                processing = false;
+            }
+        });
         
         // ============================================
         // ЗАПУСК
         // ============================================
         chat.scrollTop = chat.scrollHeight;
-        console.log('🍎 Apple Chat loaded!');
+        console.log('🤖 AI Чат загружен!');
+        
+        if (isInTelegram) {
+            console.log('📱 Запущено в Telegram WebApp');
+            console.log('👤 Пользователь:', userData);
+            console.log('✅ Отправка сообщений через бота активна');
+        } else {
+            console.log('⚠️ Запущено вне Telegram. AI не доступен.');
+        }
     </script>
 </body>
 </html>
