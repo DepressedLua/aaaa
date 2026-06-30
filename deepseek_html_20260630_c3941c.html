@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Чат</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ============================================
+           ПЕРЕМЕННЫЕ
+           ============================================ */
+        :root {
+            --bg: #0a0a0a;
+            --bg-chat: #0a0a0a;
+            --bg-bubble-user: #007aff;
+            --bg-bubble-bot: #1c1c1e;
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e93;
+            --text-bubble-user: #ffffff;
+            --text-bubble-bot: #ffffff;
+            --border: rgba(255,255,255,0.05);
+            --shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+        
+        [data-theme="light"] {
+            --bg: #f2f2f7;
+            --bg-chat: #ffffff;
+            --bg-bubble-user: #007aff;
+            --bg-bubble-bot: #e9e9ed;
+            --text-primary: #000000;
+            --text-secondary: #8e8e93;
+            --text-bubble-user: #ffffff;
+            --text-bubble-bot: #000000;
+            --border: rgba(0,0,0,0.05);
+            --shadow: 0 8px 32px rgba(0,0,0,0.08);
+        }
+        
+        /* ============================================
+           ОБЩИЕ СТИЛИ
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+        
+        /* ============================================
+           КОНТЕЙНЕР
+           ============================================ */
+        .app {
+            width: 100%;
+            max-width: 430px;
+            height: 100vh;
+            max-height: 932px;
+            background: var(--bg-chat);
+            border-radius: 0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        @media (min-width: 431px) {
+            .app {
+                border-radius: 32px;
+                height: 90vh;
+            }
+        }
+        
+        /* ============================================
+           ШАПКА
+           ============================================ */
+        .header {
+            padding: 16px 20px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-chat);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .menu-btn {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 22px;
+            cursor: pointer;
+            padding: 4px;
+            transition: all 0.2s;
+            opacity: 0.6;
+        }
+        
+        .menu-btn:hover {
+            opacity: 1;
+        }
+        
+        .header-title {
+            font-size: 17px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+        }
+        
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .theme-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            transition: all 0.2s;
+            opacity: 0.6;
+        }
+        
+        .theme-btn:hover {
+            opacity: 1;
+            color: var(--text-primary);
+        }
+        
+        /* ============================================
+           ЧАТ
+           ============================================ */
+        .chat {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 16px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            scroll-behavior: smooth;
+            background: var(--bg-chat);
+            transition: all 0.3s ease;
+        }
+        
+        .chat::-webkit-scrollbar {
+            width: 0;
+        }
+        
+        /* ============================================
+           СООБЩЕНИЯ
+           ============================================ */
+        .message {
+            display: flex;
+            flex-direction: column;
+            max-width: 82%;
+            animation: messageIn 0.3s ease;
+            gap: 2px;
+        }
+        
+        @keyframes messageIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95) translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        .message.bot {
+            align-self: flex-start;
+        }
+        
+        .message.user {
+            align-self: flex-end;
+        }
+        
+        .bubble {
+            padding: 10px 14px;
+            border-radius: 18px;
+            font-size: 16px;
+            line-height: 1.45;
+            word-wrap: break-word;
+            letter-spacing: -0.2px;
+            transition: all 0.2s;
+        }
+        
+        .message.bot .bubble {
+            background: var(--bg-bubble-bot);
+            color: var(--text-bubble-bot);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .message.user .bubble {
+            background: var(--bg-bubble-user);
+            color: var(--text-bubble-user);
+            border-bottom-right-radius: 4px;
+        }
+        
+        .time {
+            font-size: 11px;
+            color: var(--text-secondary);
+            padding: 0 4px;
+            margin-top: 2px;
+            opacity: 0.7;
+            letter-spacing: 0.2px;
+        }
+        
+        .message.bot .time {
+            padding-left: 12px;
+        }
+        
+        .message.user .time {
+            padding-right: 12px;
+            text-align: right;
+        }
+        
+        /* ============================================
+           ИНДИКАТОР ПЕЧАТИ
+           ============================================ */
+        .typing {
+            align-self: flex-start;
+            display: flex;
+            gap: 4px;
+            padding: 8px 16px;
+            background: var(--bg-bubble-bot);
+            border-radius: 18px;
+            border-bottom-left-radius: 4px;
+            animation: messageIn 0.3s ease;
+        }
+        
+        .typing span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            animation: typingBounce 1.4s infinite;
+            opacity: 0.4;
+        }
+        
+        .typing span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typingBounce {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-6px); opacity: 1; }
+        }
+        
+        /* ============================================
+           ВВОД
+           ============================================ */
+        .input-area {
+            padding: 10px 16px 16px;
+            background: var(--bg-chat);
+            border-top: 1px solid var(--border);
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .input-wrapper {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            background: var(--bg-bubble-bot);
+            border-radius: 24px;
+            padding: 4px 4px 4px 16px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        
+        .input-wrapper:focus-within {
+            border-color: var(--bg-bubble-user);
+        }
+        
+        .input-wrapper textarea {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 16px;
+            font-family: inherit;
+            resize: none;
+            padding: 8px 0;
+            min-height: 24px;
+            max-height: 120px;
+            line-height: 1.4;
+            letter-spacing: -0.2px;
+        }
+        
+        .input-wrapper textarea::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+        
+        .input-wrapper .send-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            background: var(--bg-bubble-user);
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            opacity: 0.3;
+            transform: scale(1);
+        }
+        
+        .input-wrapper .send-btn.active {
+            opacity: 1;
+        }
+        
+        .input-wrapper .send-btn:active {
+            transform: scale(0.92);
+        }
+        
+        /* ============================================
+           САЙДБАР (чаты)
+           ============================================ */
+        .sidebar {
+            position: absolute;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100%;
+            background: var(--bg-chat);
+            border-right: 1px solid var(--border);
+            padding: 16px;
+            transition: all 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 32px rgba(0,0,0,0.2);
+        }
+        
+        .sidebar.open {
+            left: 0;
+        }
+        
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .sidebar-header .title {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        
+        .sidebar-header .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        .sidebar .new-chat-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: none;
+            background: var(--bg-bubble-user);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            width: 100%;
+            margin-bottom: 12px;
+        }
+        
+        .sidebar .new-chat-btn:active {
+            transform: scale(0.97);
+        }
+        
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .chat-list .item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        .chat-list .item:hover {
+            background: var(--bg-bubble-bot);
+            color: var(--text-primary);
+        }
+        
+        .chat-list .item.active {
+            background: var(--bg-bubble-bot);
+            color: var(--text-primary);
+        }
+        
+        .chat-list .item .icon {
+            font-size: 16px;
+            opacity: 0.6;
+        }
+        
+        .chat-list .item .text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .chat-list .item .del {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        
+        .chat-list .item:hover .del {
+            opacity: 1;
+        }
+        
+        .chat-list .item .del:hover {
+            color: #ff3b30;
+        }
+        
+        /* ============================================
+           OVERLAY
+           ============================================ */
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.35s ease;
+        }
+        
+        .overlay.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        /* ============================================
+           АДАПТИВ
+           ============================================ */
+        @media (max-width: 430px) {
+            .app {
+                border-radius: 0 !important;
+                max-height: 100vh;
+            }
+            
+            .sidebar {
+                width: 85%;
+                left: -85%;
+            }
+            
+            .sidebar.open {
+                left: 0;
+            }
+        }
+        
+        @media (max-width: 380px) {
+            .bubble {
+                font-size: 15px;
+                padding: 8px 12px;
+            }
+            .header-title {
+                font-size: 16px;
+            }
+            .message {
+                max-width: 88%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app" id="app">
+        <!-- OVERLAY -->
+        <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+        
+        <!-- SIDEBAR -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="title">Чаты</div>
+                <button class="close-btn" onclick="closeSidebar()">✕</button>
+            </div>
+            <button class="new-chat-btn" onclick="newChat()">✏️ Новый чат</button>
+            <div class="chat-list" id="chatList">
+                <div class="item active" onclick="selectChat(this)">
+                    <span class="icon">💬</span>
+                    <span class="text">Привет, мир!</span>
+                    <button class="del" onclick="event.stopPropagation(); deleteChat(this)">✕</button>
+                </div>
+                <div class="item" onclick="selectChat(this)">
+                    <span class="icon">💬</span>
+                    <span class="text">Как дела?</span>
+                    <button class="del" onclick="event.stopPropagation(); deleteChat(this)">✕</button>
+                </div>
+                <div class="item" onclick="selectChat(this)">
+                    <span class="icon">💬</span>
+                    <span class="text">Расскажи про AI</span>
+                    <button class="del" onclick="event.stopPropagation(); deleteChat(this)">✕</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-left">
+                <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+                <div class="header-title">Чат</div>
+            </div>
+            <div class="header-right">
+                <button class="theme-btn" onclick="toggleTheme()" id="themeBtn">🌙</button>
+            </div>
+        </div>
+        
+        <!-- CHAT -->
+        <div class="chat" id="chat">
+            <!-- БОТ -->
+            <div class="message bot">
+                <div class="bubble">Привет! Я AI ассистент. Чем могу помочь? 🚀</div>
+                <div class="time">12:00</div>
+            </div>
+            
+            <!-- ПОЛЬЗОВАТЕЛЬ -->
+            <div class="message user">
+                <div class="bubble">Привет! Расскажи что-нибудь интересное</div>
+                <div class="time">12:01</div>
+            </div>
+            
+            <!-- БОТ -->
+            <div class="message bot">
+                <div class="bubble">Знаешь ли ты, что ChatGPT набрал 1 млн пользователей за 5 дней? Это самый быстрый рост в истории!</div>
+                <div class="time">12:01</div>
+            </div>
+        </div>
+        
+        <!-- INPUT -->
+        <div class="input-area">
+            <div class="input-wrapper">
+                <textarea id="input" rows="1" placeholder="Сообщение..." 
+                    onkeydown="handleKey(event)" 
+                    oninput="autoResize(this)"></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">↑</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // ТЕМА
+        // ============================================
+        let theme = localStorage.getItem('theme') || 'dark';
+        const themeBtn = document.getElementById('themeBtn');
+        
+        function applyTheme(t) {
+            document.documentElement.setAttribute('data-theme', t);
+            theme = t;
+            localStorage.setItem('theme', t);
+            themeBtn.textContent = t === 'dark' ? '☀️' : '🌙';
+        }
+        
+        function toggleTheme() {
+            applyTheme(theme === 'dark' ? 'light' : 'dark');
+        }
+        
+        applyTheme(theme);
+        
+        // ============================================
+        // САЙДБАР
+        // ============================================
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('show');
+        }
+        
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('overlay').classList.remove('show');
+        }
+        
+        // ============================================
+        // ЧАТЫ
+        // ============================================
+        function selectChat(el) {
+            document.querySelectorAll('.chat-list .item').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+            document.querySelector('.header-title').textContent = el.querySelector('.text').textContent;
+            closeSidebar();
+        }
+        
+        function deleteChat(el) {
+            const item = el.closest('.item');
+            if (confirm('Удалить чат?')) {
+                item.remove();
+                if (item.classList.contains('active')) {
+                    const first = document.querySelector('.chat-list .item');
+                    if (first) selectChat(first);
+                    else newChat();
+                }
+            }
+        }
+        
+        function newChat() {
+            const list = document.getElementById('chatList');
+            const item = document.createElement('div');
+            item.className = 'item';
+            item.innerHTML = `
+                <span class="icon">💬</span>
+                <span class="text">Новый чат</span>
+                <button class="del" onclick="event.stopPropagation(); deleteChat(this)">✕</button>
+            `;
+            item.onclick = function() { selectChat(this); };
+            list.prepend(item);
+            selectChat(item);
+            
+            // Очищаем сообщения
+            document.getElementById('chat').innerHTML = `
+                <div class="message bot">
+                    <div class="bubble">Привет! Я AI ассистент. Чем могу помочь? 🚀</div>
+                    <div class="time">${new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+                </div>
+            `;
+        }
+        
+        // ============================================
+        // ОТПРАВКА
+        // ============================================
+        const chat = document.getElementById('chat');
+        const input = document.getElementById('input');
+        const sendBtn = document.getElementById('sendBtn');
+        let processing = false;
+        
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+            sendBtn.classList.toggle('active', el.value.trim().length > 0);
+        }
+        
+        function handleKey(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        }
+        
+        function addMessage(role, text, time) {
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = text;
+            
+            const timeEl = document.createElement('div');
+            timeEl.className = 'time';
+            timeEl.textContent = time || new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+            
+            div.appendChild(bubble);
+            div.appendChild(timeEl);
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+        
+        function showTyping() {
+            const div = document.createElement('div');
+            div.className = 'message bot';
+            div.id = 'typing';
+            div.innerHTML = `
+                <div class="typing">
+                    <span></span><span></span><span></span>
+                </div>
+            `;
+            chat.appendChild(div);
+            chat.scrollTop = chat.scrollHeight;
+        }
+        
+        function hideTyping() {
+            const el = document.getElementById('typing');
+            if (el) el.remove();
+        }
+        
+        function sendMessage() {
+            const text = input.value.trim();
+            if (!text || processing) return;
+            
+            const time = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+            
+            addMessage('user', text, time);
+            input.value = '';
+            input.style.height = 'auto';
+            sendBtn.classList.remove('active');
+            processing = true;
+            
+            showTyping();
+            
+            setTimeout(() => {
+                hideTyping();
+                
+                const replies = [
+                    'Отличный вопрос! 🤔 Давайте разберемся вместе.',
+                    'Интересно! 💡 Вот что я думаю по этому поводу...',
+                    'Хорошая мысль! 🎯 Давай углубимся в эту тему.',
+                    'Я вижу, что ты разбираешься в этом! 🔥',
+                    'Отличный подход! 💪 Продолжай в том же духе.',
+                    'Это действительно важно! 🚀 Вот несколько идей.'
+                ];
+                
+                addMessage('bot', replies[Math.floor(Math.random() * replies.length)], time);
+                processing = false;
+            }, 1200 + Math.random() * 1000);
+        }
+        
+        // ============================================
+        // ЗАПУСК
+        // ============================================
+        chat.scrollTop = chat.scrollHeight;
+        console.log('🍎 Apple Chat loaded!');
+    </script>
+</body>
+</html>
